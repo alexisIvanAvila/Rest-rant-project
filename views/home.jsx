@@ -10,6 +10,11 @@ function home () {
       </Def>
     )
   }
+
+  <a href="/places">
+  <button className="btn-primary">Places Page</button>
+</a>
+
   
 
 module.exports = home
