@@ -24,7 +24,21 @@ router.get('/', (req, res) => {
 
 router.get('/new', (req, res)  => {
     res.render('places/new')
-})    
+})  
+
+router.render('places/edit', (req, res) => {
+    let id = Number(req.parama.id)
+    if (isNaN(id)) {
+        res.render('error404')
+    }
+    else if (!places[id]) {
+        res.render('error404')
+    }
+    else {
+        res.render('places/edit', {place: places[id]})
+    }
+    res.render('places/edit')
+})
     let places = [{
         name: 'H-Thai-ML',
         city: 'Seattle',
