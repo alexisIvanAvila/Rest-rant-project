@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const db = require('../models')
 
+//INDEX
 router.get('/', (req, res) => {
     db.Place.find()
     .then((places) => {
@@ -12,6 +13,7 @@ router.get('/', (req, res) => {
     })
 })
 
+//CREATE PLACE
 router.post('/', (req, res) => {
   if (!req.body.pic) {
     // Default image if one is not provided
@@ -28,64 +30,85 @@ router.post('/', (req, res) => {
   })
 })
 
-
+//NEW PLACE
 router.get('/new', (req, res) => {
   res.render('places/new')
 })
 
+//SHOW
 router.get('/:id', (req, res) => {
-    db.Place.findById(req.params.id)
+  Places.findById(req.params.id)
+  .populate('comments')
+  .then(place => {
+      console.log(place.comments)
+      res.render('places/show', { place })
+  })
+  .catch(err => {
+      console.log('err', err)
+      res.render('error404')
+  })
+})
+//UPDATE
+router.put('/:id', (req, res) => {
+  Places.findByIdAndUpdate(req.params.id, req.body)
+  .then(() => {
+      res.redirect(`/places/${req.params.id}`)
+  })
+  .catch(err => {
+      console.log('err', err)
+      res.render('error404')
+  })
+})
+
+//DELETE PLACES
+router.delete('/:id', (req, res) => {
+  Places.findByIdAndDelete(req.params.id)
     .then(place => {
-        res.render('places/show', { place })
+      res.redirect('/places')
     })
     .catch(err => {
-        console.log('err', err)
-        res.render('error404')
-    })
+      console.log('err', err)
+      res.render('error404')
+  })
 })
 
-
-
+//EDIT PLACE 
 router.get('/:id/edit', (req, res) => {
-  let id = Number(req.params.id)
-  if (isNaN(id)) {
+  Places.findById(req.params.id)
+  .then(place => {
+      res.render('places/edit', { place })
+  })
+  .catch(err => {
       res.render('error404')
-  }
-  else if (!places[id]) {
+  })
+})
+
+//CREATE COMMENT
+router.post('/:id/comment', (req, res) => {
+  console.log(req.body)
+  db.Place.findById(req.params.id)
+  .then(place => {
+      db.Comment.create(req.body)
+      .then(comment => {
+          place.comments.push(comment.id)
+          place.save()
+          .then(() => {
+              res.redirect(`/places/${req.params.id}`)
+          })
+      })
+      .catch(err => {
+          res.render('error404')
+      })
+  })
+  .catch(err => {
       res.render('error404')
-  }
-  else {
-    res.render('places/edit', { place: places[id] })
-  }
+  })
 })
 
-router.put('/:id', (req, res) => {
-  let id = Number(req.params.id)
-  if (isNaN(id)) {
-      res.render('error404')
-  }
-  else if (!places[id]) {
-      res.render('error404')
-  }
-  else {
-      res.redirect(`/places/${id}`)
-  }
-})
-
-router.delete('/:id', (req, res) => {
-  res.send('DELETE /places/:id stub')
-})
-
-router.get('/:id/edit', (req, res) => {
-  res.send('GET edit form stub')
-})
-
-router.post('/:id/rant', (req, res) => {
-  res.send('GET /places/:id/rant stub')
-})
-
+//DELETE COMMENT
 router.delete('/:id/rant/:rantId', (req, res) => {
     res.send('GET /places/:id/rant/:rantId stub')
 })
+
 
 module.exports = router
