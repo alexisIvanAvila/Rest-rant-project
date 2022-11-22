@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const db = require('../models/places.js')
+const db = require('../models')
 
 router.get('/', (req, res) => {
     db.Place.find()
@@ -43,6 +43,20 @@ router.get('/:id', (req, res) => {
         res.render('error404')
     })
 })
+
+router.get('/:id/edit', (req, res) => {
+  let id = Number(req.params.id)
+  if (isNaN(id)) {
+      res.render('error404')
+  }
+  else if (!places[id]) {
+      res.render('error404')
+  }
+  else {
+    res.render('places/edit', { place: places[id] })
+  }
+})
+
 
 router.get('/:id', (req, res) => {
   res.send('GET /places/:id stub')
