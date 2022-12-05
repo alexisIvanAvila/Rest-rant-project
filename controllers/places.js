@@ -3,21 +3,21 @@ const db = require('../models')
 
 //INDEX
 router.get('/', (req, res) => {
-    db.Place.find()
-    .then((places) => {
-      res.render('places/index', { places })
-    })
-    .catch(err => {
-      console.log(err) 
-      res.render('error404')
-    })
+  db.Place.find()
+  .then((places) => {
+    res.render('places/index', { places })
+  })
+  .catch(err => {
+    console.log(err) 
+    res.render('error404')
+  })
 })
 
 //CREATE PLACE
 router.post('/', (req, res) => {
   if (!req.body.pic) {
     // Default image if one is not provided
-    req.body.pic = '/images/salad.jpg'
+    req.body.pic = 'http://placekitten.com/400/400'
   }
 
   db.Place.create(req.body)
@@ -37,7 +37,7 @@ router.get('/new', (req, res) => {
 
 //SHOW
 router.get('/:id', (req, res) => {
-  Places.findById(req.params.id)
+  db.Place.findById(req.params.id)
   .populate('comments')
   .then(place => {
       console.log(place.comments)
@@ -48,9 +48,10 @@ router.get('/:id', (req, res) => {
       res.render('error404')
   })
 })
+
 //UPDATE
 router.put('/:id', (req, res) => {
-  Places.findByIdAndUpdate(req.params.id, req.body)
+  db.Place.findByIdAndUpdate(req.params.id, req.body)
   .then(() => {
       res.redirect(`/places/${req.params.id}`)
   })
@@ -60,21 +61,22 @@ router.put('/:id', (req, res) => {
   })
 })
 
+
 //DELETE PLACES
 router.delete('/:id', (req, res) => {
-  Places.findByIdAndDelete(req.params.id)
-    .then(place => {
+  db.Place.findByIdAndDelete(req.params.id)
+  .then(place => {
       res.redirect('/places')
-    })
-    .catch(err => {
+  })
+  .catch(err => {
       console.log('err', err)
       res.render('error404')
   })
 })
 
-//EDIT PLACE 
+//EDIT PLACE
 router.get('/:id/edit', (req, res) => {
-  Places.findById(req.params.id)
+  db.Place.findById(req.params.id)
   .then(place => {
       res.render('places/edit', { place })
   })
@@ -105,10 +107,9 @@ router.post('/:id/comment', (req, res) => {
   })
 })
 
-//DELETE COMMENT
+//DELTE COMMENT
 router.delete('/:id/rant/:rantId', (req, res) => {
     res.send('GET /places/:id/rant/:rantId stub')
 })
 
-
-module.exports = router
+module.exports = router3
